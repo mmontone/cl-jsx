@@ -11,7 +11,7 @@
   :serial t
   :license "MIT"
   :author "\"the Phoeron\" Colin J.E. Lupton <sysop@thephoeron.com>"
-  :description "JSX DSL"
+  :description "JSX Compiler for Common Lisp"
   :version "0.0.1"
   :depends-on (:cl-who
                :parenscript)
