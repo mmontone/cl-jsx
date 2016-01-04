@@ -46,7 +46,7 @@
   (:destructure (begin text end)
                 text))
 
-(defrule attributes (* (and space+ attribute space*))
+(defrule attributes (* (and space* attribute space*))
   (:function (lambda (attributes)
                (mapcar #'second attributes))))
 
@@ -133,6 +133,7 @@
 (parse 'open-element "<adsf>")
 (parse 'open-element "<asdf asdf={aaa}>")
 (parse 'open-element "<asdf asdf=\"asdf\">")
+(parse 'open-element "<asdf foo=\"foo\" bar=\"bar\">")
 (parse 'open-element "<asdf asdf=\"asdf {adsf}\">")
 
 (parse 'close-element "</asdf>")
