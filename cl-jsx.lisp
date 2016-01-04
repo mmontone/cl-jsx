@@ -24,33 +24,48 @@
        (push char content)
        :finally (setf tag-name (coerce (nreverse tag-name) 'string)))
 
-    ;; Read until </tag-name> is found
+    ;; Read until last </tag-name> is found
     (loop
-       :with close-tag-start := 0
+       :with tag-start := nil
+       :with close-tag-start := nil
+       :with tags-found := 0
        :for char := (read-char stream nil nil t)
        :while char
        :do
        (let ((current-tag-name (coerce (reverse current-tag-chars) 'string)))
+         #+debug(format t "~A~%" (list :char char :tag tag-name
+                                :start tag-start :close close-tag-start
+                                :found tags-found))
          (cond
-           ((and (string= current-tag-name tag-name)
+           ((and tag-start
+                 (string= current-tag-name tag-name)
+                 (member char (list #\space #\newline #\tab #\>)))
+            (incf tags-found))
+           ((and close-tag-start
+                 (string= current-tag-name tag-name)
                  (eql char #\>))
-            (push char content)
-            (return-from read-jsx (coerce (nreverse content) 'string)))
-           ((and (zerop close-tag-start)
+            (if (zerop tags-found)
+                (progn
+                  (push char content)
+                  (return-from read-jsx (coerce (nreverse content) 'string)))
+                (decf tags-found)))
+           ((and (not tag-start)
                  (eql char #\<))
-            (incf close-tag-start))
-           ((and (eql close-tag-start 1)
+            (setf tag-start t))
+           ((and tag-start
                  (eql char #\/))
-            (incf close-tag-start))
+            (setf close-tag-start t)
+            (setf tag-start nil))
            ((let ((new-tag-name (coerce (reverse (cons char current-tag-chars))
                                         'string)))
-              (and (eql close-tag-start 2)
+              (and (or tag-start close-tag-start)
                    (let ((pos (search new-tag-name tag-name)))
                      (and pos (zerop pos)))))
             (push char current-tag-chars))
            (t
             (setf current-tag-chars nil)
-            (setf close-tag-start 0))))
+            (setf tag-start nil)
+            (setf close-tag-start nil))))
        (push char content))
 
     ;; Error
