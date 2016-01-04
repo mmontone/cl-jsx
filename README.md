@@ -1,4 +1,4 @@
-# cl-jsx
+# CL-JSX
 
 [![Quicklisp](http://quickdocs.org/badge/cl-jsx.svg)](http://quickdocs.org/cl-jsx/)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
