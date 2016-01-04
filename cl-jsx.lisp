@@ -2,16 +2,17 @@
 
 ;; Reader syntax
 
-(defun read-jsx (stream)
+(defun read-jsx (stream &key (parse-open t))
   ;; First, read the jsx element tag name
   (let ((tag-name nil)
         (content nil)
         (current-tag-chars nil))
-    
-    (let ((open-char (read-char stream)))
-      (assert (eql open-char #\<)
-              nil "Error parsing JSX")
-      (push open-char content))
+
+    (when parse-open
+      (let ((open-char (read-char stream)))
+        (assert (eql open-char #\<)
+                nil "Error parsing JSX")
+        (push open-char content)))
     
     (loop
        :for char := (peek-char nil stream nil nil)
@@ -70,9 +71,17 @@
   (values (read-jsx s) (read-line s nil nil)))
 
 (with-input-from-string (s "<lala>asdf<foo></foo></lala>")
-  (values (read-jsx s) (read-line s nil nil)))
+  (values (read-jsx s) (read-line s nil nil)))   
 
-          
-       
-    
-    
+
+(set-dispatch-macro-character
+ #\# #\<
+ (lambda (stream c1 c2)
+   (jsx.who:emit-who
+    (jsx.parser:parse-jsx
+     (concatenate 'string "<" (read-jsx stream :parse-open nil))))))
+
+;; Test
+
+;; (who:with-html-output-to-string (html)
+;;   #<lala>hello</lala>)

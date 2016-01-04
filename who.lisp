@@ -1,6 +1,8 @@
 (defpackage :jsx.who
   (:use :cl)
-  (:export #:compile-jsx))
+  (:export #:emit-who))
+
+(in-package :jsx.who)
 
 ;; cl-who JSX compiler
 
@@ -53,9 +55,12 @@
                             `(princ ,(read-from-string (second x)) ,attr))))))))
 
 ;; Test
-
+#+nil(progn
+       
 (emit-who (jsx.parser:parse-jsx "<foo></foo>"))
 (emit-who (jsx.parser:parse-jsx "<foo>lala</foo>"))
 (emit-who (jsx.parser:parse-jsx "<foo>yes{asdf}</foo>"))
 (emit-who (jsx.parser:parse-jsx "<foo bar={yes}>lalal</foo>"))
 (emit-who (jsx.parser:parse-jsx "<asdf now={now}>ff <foo></foo> asdf {haha}</asdf>"))
+
+)

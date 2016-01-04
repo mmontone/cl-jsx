@@ -14,8 +14,10 @@
   :description "JSX Compiler for Common Lisp"
   :version "0.0.1"
   :depends-on (:cl-who
-               :parenscript)
+               :esrap)
   :components ((:file "packages")
+               (:file "parser")
+               (:file "who")
                (:file "cl-jsx")))
 
 ;; EOF

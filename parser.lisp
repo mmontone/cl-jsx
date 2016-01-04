@@ -112,7 +112,7 @@
   (apply #'parse 'element text args))
 
 ;; Tests
-
+#+nil(progn
 (parse 'tag-name "asdf")
 (parse 'tag-name "adfd>") ;; Error
 (parse 'tag-name "asdf adsf") ;; Error
@@ -141,3 +141,4 @@
 (parse 'element "<asdf></asdf>")
 (parse 'element "<asdf>ff <foo></foo> asdf {haha}</asdf>")
 (parse 'element "<asdf foo={bar}>haha</asdf>")
+)
