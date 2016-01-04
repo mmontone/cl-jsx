@@ -4,6 +4,7 @@
 
 (defpackage cl-jsx
   (:nicknames :jsx)
-  (:use :cl :cl-user :cl-who))
+  (:use :cl)
+  (:export #:enable-jsx-syntax))
 
 ;; EOF

@@ -13,7 +13,7 @@
         (assert (eql open-char #\<)
                 nil "Error parsing JSX")
         (push open-char content)))
-    
+
     (loop
        :for char := (peek-char nil stream nil nil t)
        :while (and char
@@ -34,8 +34,8 @@
        :do
        (let ((current-tag-name (coerce (reverse current-tag-chars) 'string)))
          #+debug(format t "~A~%" (list :char char :tag tag-name
-                                :start tag-start :close close-tag-start
-                                :found tags-found))
+                                       :start tag-start :close close-tag-start
+                                       :found tags-found))
          (cond
            ((and tag-start
                  (string= current-tag-name tag-name)
@@ -72,31 +72,37 @@
     (error "Error reading JSX element: ~A" tag-name)))
 
 ;; Test
+#+nil(progn
+       (with-input-from-string (s "<lala></lala>")
+         (values (read-jsx s) (read-line s nil nil)))
 
-(with-input-from-string (s "<lala></lala>")
-  (values (read-jsx s) (read-line s nil nil)))
+       (with-input-from-string (s "<lala>asdf</lala>")
+         (values (read-jsx s) (read-line s nil nil)))
 
-(with-input-from-string (s "<lala>asdf</lala>")
-  (values (read-jsx s) (read-line s nil nil)))
+       (with-input-from-string (s "<lala>asdf<foo></lala>")
+         (values (read-jsx s) (read-line s nil nil)))
 
-(with-input-from-string (s "<lala>asdf<foo></lala>")
-  (values (read-jsx s) (read-line s nil nil)))
+       (with-input-from-string (s "<lala>asdf</foo></lala>")
+         (values (read-jsx s) (read-line s nil nil)))
 
-(with-input-from-string (s "<lala>asdf</foo></lala>")
-  (values (read-jsx s) (read-line s nil nil)))
+       (with-input-from-string (s "<lala>asdf<foo></foo></lala>")
+         (values (read-jsx s) (read-line s nil nil)))
 
-(with-input-from-string (s "<lala>asdf<foo></foo></lala>")
-  (values (read-jsx s) (read-line s nil nil)))
+       (with-input-from-string (s "<lala foo=\"bar\">asdf<foo></foo></lala>")
+         (values (read-jsx s) (read-line s nil nil))))
 
-(with-input-from-string (s "<lala foo=\"bar\">asdf<foo></foo></lala>")
-  (values (read-jsx s) (read-line s nil nil)))
+(named-readtables:defreadtable :jsx
+  (:merge :standard)
+  (:dispatch-macro-char
+   #\# #\<
+   (lambda (stream c1 c2)
+     (jsx.who:emit-who
+      (jsx.parser:parse-jsx
+       (concatenate 'string "<" (read-jsx stream :parse-open nil)))))))
 
-(set-dispatch-macro-character
- #\# #\<
- (lambda (stream c1 c2)
-   (jsx.who:emit-who
-    (jsx.parser:parse-jsx
-     (concatenate 'string "<" (read-jsx stream :parse-open nil))))))
+
+(defun enable-jsx-syntax ()
+  (named-readtables:in-readtable :jsx))
 
 ;; Test
 

@@ -14,7 +14,8 @@
   :description "JSX Compiler for Common Lisp"
   :version "0.0.1"
   :depends-on (:cl-who
-               :esrap)
+               :esrap
+               :named-readtables)
   :components ((:file "packages")
                (:file "parser")
                (:file "who")
