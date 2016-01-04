@@ -61,7 +61,10 @@
   (:destructure (open _ tag-name close)
                 (list :close tag-name)))
 
-(defrule jsx-escape-text (+ (not (or #\} #\{)))
+(defrule jsx-escape-text-ignore (and #\{ (+ (not #\})) #\})
+  (:text t))
+
+(defrule jsx-escape-text (+ (or jsx-escape-text-ignore (not #\})))
   (:text t))
 
 (defrule jsx-escape (and #\{ jsx-escape-text #\})
@@ -142,4 +145,7 @@
 (parse 'element "<asdf></asdf>")
 (parse 'element "<asdf>ff <foo></foo> asdf {haha}</asdf>")
 (parse 'element "<asdf foo={bar}>haha</asdf>")
+(parse 'element "<lala aaa=\"asd\" yes=\"adf\">{(loop for x from 1 to 10
+                   do #<p>{hello}</p>)}
+                   </lala>")
 )
