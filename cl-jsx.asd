@@ -10,7 +10,7 @@
 (defsystem cl-jsx
   :serial t
   :license "MIT"
-  :author "\"the Phoeron\" Colin J.E. Lupton <sysop@thephoeron.com>"
+  :author "Mariano Montone <marianomontone@gmail.com>"
   :description "JSX Compiler for Common Lisp"
   :version "0.0.1"
   :depends-on (:cl-who
