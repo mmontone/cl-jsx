@@ -16,9 +16,10 @@
 
 (defmethod %emit-who ((type (eql :element)) element)
   (destructuring-bind (_ tag-name attributes content) element
-    `(,(make-keyword tag-name)
-       ,@(emit-attributes attributes)
-       ,@(emit-content content))))
+    `(who:htm
+      (,(make-keyword tag-name)
+        ,@(emit-attributes attributes)
+        ,@(emit-content content)))))
 
 (defun emit-content (content)
   (loop
