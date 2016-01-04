@@ -108,8 +108,8 @@
 
 ;; Toplevel
 
-(defun parse-jsx (string)
-  (parse 'element string))
+(defun parse-jsx (text &rest args &key (start 0) end junk-allowed raw)
+  (apply #'parse 'element text args))
 
 ;; Tests
 
