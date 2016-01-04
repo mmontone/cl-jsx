@@ -29,7 +29,7 @@
        ((stringp elem)
         `(who:str ,elem))
        ((eql (first elem) :jsx-escape)
-        (read-from-string (second elem)))
+        `(who:str ,(read-from-string (second elem))))
        ((eql (first elem) :element)
         (emit-who elem)))))
 
