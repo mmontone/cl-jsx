@@ -17,7 +17,7 @@
     (loop
        :for char := (peek-char nil stream nil nil)
        :while (and char
-                   (not (eql char #\>)))
+                   (not (member char (list #\> #\Space))))
        :do
        (push char tag-name)
        (read-char stream nil nil)
@@ -71,8 +71,10 @@
   (values (read-jsx s) (read-line s nil nil)))
 
 (with-input-from-string (s "<lala>asdf<foo></foo></lala>")
-  (values (read-jsx s) (read-line s nil nil)))   
+  (values (read-jsx s) (read-line s nil nil)))
 
+(with-input-from-string (s "<lala foo=\"bar\">asdf<foo></foo></lala>")
+  (values (read-jsx s) (read-line s nil nil)))
 
 (set-dispatch-macro-character
  #\# #\<
