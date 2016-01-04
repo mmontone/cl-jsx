@@ -54,7 +54,7 @@
        (push char content))
 
     ;; Error
-    (error "Error reading JSX stream")))
+    (error "Error reading JSX element: ~A" tag-name)))
 
 ;; Test
 
