@@ -91,7 +91,25 @@
                 (list :element
                       (second open-tag)
                       (third open-tag)
-                      content)))
+                      (flatten-content content))))
+
+(defun flatten-content (content)
+  (loop
+     :with result := nil
+     :for elem :in content
+     :do
+     (if (eql (first elem) :element)
+         (push elem result)
+         ;; else
+         (loop
+            :for x :in elem
+            :do (push x result)))
+     :finally (return (nreverse result))))
+
+;; Toplevel
+
+(defun parse-jsx (string)
+  (parse 'element string))
 
 ;; Tests
 
@@ -121,5 +139,5 @@
 
 (parse 'element "<asdf>asdf</asdf>")
 (parse 'element "<asdf></asdf>")
-(parse 'element "<asdf>ff <foo></foo></asdf>")
+(parse 'element "<asdf>ff <foo></foo> asdf {haha}</asdf>")
 (parse 'element "<asdf foo={bar}>haha</asdf>")
