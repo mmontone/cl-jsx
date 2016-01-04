@@ -9,25 +9,25 @@
         (current-tag-chars nil))
 
     (when parse-open
-      (let ((open-char (read-char stream)))
+      (let ((open-char (read-char stream t :eof t)))
         (assert (eql open-char #\<)
                 nil "Error parsing JSX")
         (push open-char content)))
     
     (loop
-       :for char := (peek-char nil stream nil nil)
+       :for char := (peek-char nil stream nil nil t)
        :while (and char
                    (not (member char (list #\> #\Space))))
        :do
        (push char tag-name)
-       (read-char stream nil nil)
+       (read-char stream nil nil t)
        (push char content)
        :finally (setf tag-name (coerce (nreverse tag-name) 'string)))
 
     ;; Read until </tag-name> is found
     (loop
        :with close-tag-start := 0
-       :for char := (read-char stream nil nil)
+       :for char := (read-char stream nil nil t)
        :while char
        :do
        (let ((current-tag-name (coerce (reverse current-tag-chars) 'string)))
