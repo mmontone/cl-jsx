@@ -53,7 +53,9 @@
                            ((stringp x)
                             `(write-string ,x ,attr))
                            ((eql (first x) :jsx-escape)
-                            `(princ ,(read-from-string (second x)) ,attr))))))))
+                            (let ((val (gensym "ATTRVAL")))
+                              `(let ((,val ,(read-from-string (second x))))
+                                 (when ,val (princ ,val ,attr)))))))))))
 
 ;; Test
 #+nil(progn
