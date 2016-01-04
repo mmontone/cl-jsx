@@ -29,7 +29,7 @@
        ((stringp elem)
         `(who:str ,elem))
        ((eql (first elem) :jsx-escape)
-        `(who:str ,(read-from-string (second elem))))
+        `(who:str ,(read-escaped-jsx (second elem))))
        ((eql (first elem) :element)
         (emit-who elem)))))
 
@@ -43,7 +43,7 @@
 
 (defun emit-attribute-value (value)
   (if (eql (first value) :jsx-escape)
-      (read-from-string (second value))
+      (read-escaped-jsx (second value))
       ;; else
       (let ((attr (gensym "ATTR")))
         `(with-output-to-string (,attr)
@@ -54,8 +54,21 @@
                             `(write-string ,x ,attr))
                            ((eql (first x) :jsx-escape)
                             (let ((val (gensym "ATTRVAL")))
-                              `(let ((,val ,(read-from-string (second x))))
+                              `(let ((,val ,(read-escaped-jsx (second x))))
                                  (when ,val (princ ,val ,attr)))))))))))
+(defvar *spliced-read* t)
+
+(defun read-escaped-jsx (string)
+  (let ((trimmed-string (string-trim (list #\space #\newline #\tab) string)))
+    (if (and *spliced-read*
+             (not (member (aref trimmed-string 0) (list #\" #\()))
+             (some (lambda (separator)
+                (find separator trimmed-string))
+              (list #\space #\newline #\tab)))
+        ;; Assume this is not an atom
+        (read-from-string (format nil "(~A)" string))
+        ;; else, read normally
+        (read-from-string string))))
 
 ;; Test
 #+nil(progn
