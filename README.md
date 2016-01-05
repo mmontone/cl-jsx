@@ -3,7 +3,7 @@
 [![Quicklisp](http://quickdocs.org/badge/cl-jsx.svg)](http://quickdocs.org/cl-jsx/)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
-JSX in Common Lisp
+[JSX](https://facebook.github.io/jsx/) in Common Lisp
 
 ## Embedded JSX syntax
 
