@@ -71,26 +71,6 @@
     ;; Error
     (error "Error reading JSX element: ~A" tag-name)))
 
-;; Test
-#+nil(progn
-       (with-input-from-string (s "<lala></lala>")
-         (values (read-jsx s) (read-line s nil nil)))
-
-       (with-input-from-string (s "<lala>asdf</lala>")
-         (values (read-jsx s) (read-line s nil nil)))
-
-       (with-input-from-string (s "<lala>asdf<foo></lala>")
-         (values (read-jsx s) (read-line s nil nil)))
-
-       (with-input-from-string (s "<lala>asdf</foo></lala>")
-         (values (read-jsx s) (read-line s nil nil)))
-
-       (with-input-from-string (s "<lala>asdf<foo></foo></lala>")
-         (values (read-jsx s) (read-line s nil nil)))
-
-       (with-input-from-string (s "<lala foo=\"bar\">asdf<foo></foo></lala>")
-         (values (read-jsx s) (read-line s nil nil))))
-
 (named-readtables:defreadtable :jsx
   (:merge :standard)
   (:dispatch-macro-char

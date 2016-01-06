@@ -9,7 +9,7 @@
 
 ;; NOTE: To run this test file, execute `(asdf:test-system :cl-jsx)' in your Lisp.
 
-(plan 2)
+(plan 3)
 
 (setf prove:*enable-colors* nil)
 
@@ -89,5 +89,35 @@
                    do #<p>{hello}</p>)")
       "
                    "))))
+
+(deftest reader-tests
+  (is
+   (with-input-from-string (s "<lala></lala>")
+     (list (jsx::read-jsx s) (read-line s nil nil)))
+   '("<lala></lala>" NIL))
+  (is
+   (with-input-from-string (s "<lala>asdf</lala>")
+     (list (jsx::read-jsx s) (read-line s nil nil)))
+   '("<lala>asdf</lala>" NIL))
+  (is
+   (with-input-from-string (s "<lala>asdf<foo></lala>")
+     (list (jsx::read-jsx s) (read-line s nil nil)))
+   '("<lala>asdf<foo></lala>" NIL))
+  (is
+   (with-input-from-string (s "<lala>asdf</foo></lala>")
+     (list (jsx::read-jsx s) (read-line s nil nil)))
+   '("<lala>asdf</foo></lala>" NIL))
+  (is
+   (with-input-from-string (s "<lala>asdf<foo></foo></lala>")
+     (list (jsx::read-jsx s) (read-line s nil nil)))
+   '("<lala>asdf<foo></foo></lala>" NIL))
+  (is
+   (with-input-from-string (s "<lala foo=\"bar\">asdf<foo></foo></lala>")
+     (list (jsx::read-jsx s) (read-line s nil nil)))
+   '("<lala foo=\"bar\">asdf<foo></foo></lala>" NIL))
+  (is
+   (with-input-from-string (s "<lala foo=\"bar\">asdf<foo></foo></lala>asdf")
+     (list (jsx::read-jsx s) (read-line s nil nil)))
+   '("<lala foo=\"bar\">asdf<foo></foo></lala>" "asdf")))  
 
 (run-test-all)
