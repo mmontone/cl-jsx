@@ -1,5 +1,3 @@
-;; file: cl-jsx.asd
-
 (in-package :cl-user)
 
 (defpackage cl-jsx-asd
@@ -19,6 +17,5 @@
   :components ((:file "packages")
                (:file "parser")
                (:file "who")
-               (:file "cl-jsx")))
-
-;; EOF
+               (:file "cl-jsx"))
+  :in-order-to ((asdf:test-op (asdf:test-op :cl-jsx-test))))

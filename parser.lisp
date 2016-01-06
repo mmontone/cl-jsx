@@ -113,39 +113,3 @@
 
 (defun parse-jsx (text &rest args &key (start 0) end junk-allowed raw)
   (apply #'parse 'element text args))
-
-;; Tests
-#+nil(progn
-(parse 'tag-name "asdf")
-(parse 'tag-name "adfd>") ;; Error
-(parse 'tag-name "asdf adsf") ;; Error
-
-(parse 'jsx-escape "{asdfas}")
-(parse 'jsx-escape "{asd asd fads}")
-(parse 'jsx-escape "{asdf{}") ;; Error
-(parse 'jsx-escape "{asdfas") ;; Error
-
-(parse 'attribute "asdf=\"afff\"")
-(parse 'attribute "adfs = \" asdfasdf \"")
-(parse 'attribute "asdf={aaa}")
-(parse 'attribute "asdf=\"aaa {hola}\"")
-
-(parse 'plain-text "asdf")
-(parse 'text "asdf {aaa} asdf" )
-
-(parse 'open-element "<adsf>")
-(parse 'open-element "<asdf asdf={aaa}>")
-(parse 'open-element "<asdf asdf=\"asdf\">")
-(parse 'open-element "<asdf foo=\"foo\" bar=\"bar\">")
-(parse 'open-element "<asdf asdf=\"asdf {adsf}\">")
-
-(parse 'close-element "</asdf>")
-
-(parse 'element "<asdf>asdf</asdf>")
-(parse 'element "<asdf></asdf>")
-(parse 'element "<asdf>ff <foo></foo> asdf {haha}</asdf>")
-(parse 'element "<asdf foo={bar}>haha</asdf>")
-(parse 'element "<lala aaa=\"asd\" yes=\"adf\">{(loop for x from 1 to 10
-                   do #<p>{hello}</p>)}
-                   </lala>")
-)
