@@ -9,7 +9,7 @@
   :serial t
   :license "MIT"
   :author "Mariano Montone <marianomontone@gmail.com>"
-  :description "JSX Compiler for Common Lisp"
+  :description "JSX in Common Lisp"
   :version "0.0.1"
   :depends-on (:cl-who
                :esrap
