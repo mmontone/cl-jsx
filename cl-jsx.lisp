@@ -83,8 +83,3 @@
 
 (defun enable-jsx-syntax ()
   (named-readtables:in-readtable :jsx))
-
-;; Test
-
-;; (who:with-html-output-to-string (html)
-;;   #<lala>hello</lala>)

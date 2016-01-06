@@ -71,14 +71,3 @@
         (read-from-string (format nil "(~A)" string))
         ;; else, read normally
         (read-from-string string))))
-
-;; Test
-#+nil(progn
-       
-(emit-who (jsx.parser:parse-jsx "<foo></foo>"))
-(emit-who (jsx.parser:parse-jsx "<foo>lala</foo>"))
-(emit-who (jsx.parser:parse-jsx "<foo>yes{asdf}</foo>"))
-(emit-who (jsx.parser:parse-jsx "<foo bar={yes}>lalal</foo>"))
-(emit-who (jsx.parser:parse-jsx "<asdf now={now}>ff <foo></foo> asdf {haha}</asdf>"))
-
-)

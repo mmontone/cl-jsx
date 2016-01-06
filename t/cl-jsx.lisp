@@ -9,7 +9,7 @@
 
 ;; NOTE: To run this test file, execute `(asdf:test-system :cl-jsx)' in your Lisp.
 
-(plan 3)
+(plan 4)
 
 (setf prove:*enable-colors* nil)
 
@@ -77,10 +77,13 @@
   (is (jsx.parser::parse 'jsx.parser::element "<asdf>ff <foo></foo> asdf {haha}</asdf>")
       '(:ELEMENT "asdf" NIL
         ("ff " (:ELEMENT "foo" NIL NIL) " asdf " (:JSX-ESCAPE "haha"))))
-  (is 
+  (is
    (jsx.parser::parse 'jsx.parser::element "<asdf foo={bar}>haha</asdf>")
    '(:ELEMENT "asdf" ((:ATTRIBUTE "foo" (:JSX-ESCAPE "bar"))) ("haha")))
-  (is 
+  (is-error
+   (jsx.parser::parse 'jsx.parser::element "<asdf foo={bar}>haha</fdas>")
+   'error)
+  (is
    (jsx.parser::parse 'jsx.parser::element "<lala aaa=\"asd\" yes=\"adf\">{(loop for x from 1 to 10
                    do #<p>{hello}</p>)}
                    </lala>")
@@ -118,6 +121,34 @@
   (is
    (with-input-from-string (s "<lala foo=\"bar\">asdf<foo></foo></lala>asdf")
      (list (jsx::read-jsx s) (read-line s nil nil)))
-   '("<lala foo=\"bar\">asdf<foo></foo></lala>" "asdf")))  
+   '("<lala foo=\"bar\">asdf<foo></foo></lala>" "asdf")))
+
+(defmacro render-who (jsx)
+  `(who:with-html-output-to-string (html)
+     ,(jsx.who:emit-who (jsx.parser:parse-jsx jsx))))
+
+(deftest test-who-rendering
+  ;; Test
+
+  (is (render-who "<lala>hello</lala>")
+      "<lala>hello</lala>")
+  (is (render-who "<foo></foo>")
+      "<foo></foo>")
+  (is-error (render-who "<foo>yes{asdf}</foo>") 'error)
+  (let ((asdf "asdf"))
+    (is (render-who "<foo>yes{asdf}</foo>") "<foo>yesasdf</foo>"))
+  (is
+   (let ((yes "yep"))
+     (render-who "<foo bar={yes}>lalal</foo>"))
+   "<foo bar='yep'>lalal</foo>")
+  (is (let ((now 22)
+            (haha nil))
+        (render-who "<asdf now={now}>ff <foo></foo> asdf{haha}</asdf>"))
+      "<asdf now='22'>ff <foo></foo> asdf</asdf>")
+  (is (render-who "<foo bar={nil}></foo>")
+      "<foo></foo>")
+  (is (render-who "<foo bar={t}><bar>lala</bar></foo>")
+      "<foo bar='bar'><bar>lala</bar></foo>"))
+
 
 (run-test-all)
