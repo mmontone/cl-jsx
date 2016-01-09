@@ -151,7 +151,8 @@
   (is (render-who "<foo bar={nil}></foo>")
       "<foo></foo>")
   (is (render-who "<foo bar={t}><bar>lala</bar></foo>")
-      "<foo bar='bar'><bar>lala</bar></foo>"))
-
+      "<foo bar='bar'><bar>lala</bar></foo>")
+  (is (render-who "<a href={22}>{#<a>hello{33}</a>}</a>")
+      "<a href='22'><a>hello33</a></a>"))
 
 (run-test-all)
