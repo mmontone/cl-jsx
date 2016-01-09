@@ -2,74 +2,88 @@
 
 ;; Reader syntax
 
-(defun read-jsx (stream &key (parse-open t))
-  ;; First, read the jsx element tag name
-  (let ((tag-name nil)
-        (content nil)
-        (current-tag-chars nil))
+(defun read-until-close-tag (tag-name stream content)
+  (loop
+     :with current-tag-chars := nil
+     :with tag-start := nil
+     :with close-tag-start := nil
+     :for char := (read-char stream)
+     :do
+     (block continue
+       (let ((current-tag-name
+              (coerce
+               (reverse current-tag-chars)
+               'string)))
+         #+debug(format t "~S~%" (list :char char :tag tag-name
+                                       :current current-tag-name
+                                       :start tag-start :close close-tag-start))
+         (cond
+           ((and (not tag-start)
+                 (eql char #\<))
+            ;; Opening a tag
+            (setf tag-start t))
+           ((and tag-start
+                 (eql char #\/))
+            ;; Closing a tag
+            (setf close-tag-start t)
+            (setf tag-start nil))
+           ((and tag-start
+                 (not (eql char #\/)))
+            ;; It is tag open
+            (unread-char char stream)
+            (read-jsx-content stream content :parse-open nil)
+            (setf current-tag-chars nil)
+            (setf tag-start nil)
+            (setf close-tag-start nil)
+            (return-from continue))
+           ((and close-tag-start
+                 (eql char #\>)
+                 (equalp current-tag-name tag-name))
+            ;; Tag-name closed
+            (vector-push-extend char content)
+            (return-from read-until-close-tag))            
+           ((and close-tag-start (not (eql char #\>)))
+            ;; Build the closing tagname
+            (push char current-tag-chars))
+           (t
+            ;; Nothing of the above, clear state variables
+            (setf current-tag-chars nil)
+            (setf tag-start nil)
+            (setf close-tag-start nil)))
+         (vector-push-extend char content)))))
 
+(defun read-jsx (stream &key (parse-open t))
+  (let ((content (make-array 10000 :fill-pointer 0)))
+    (read-jsx-content stream content :parse-open parse-open)
+    (coerce content 'string)))
+
+(defun read-jsx-content (stream content &key (parse-open t))
+  ;; First, read the jsx element tag name
+  (let ((tag-name nil))
     (when parse-open
       (let ((open-char (read-char stream t :eof t)))
         (assert (eql open-char #\<)
                 nil "Error parsing JSX")
-        (push open-char content)))
+        (vector-push-extend open-char content)))
 
     (loop
-       :for char := (peek-char nil stream nil nil t)
-       :while (and char
-                   (not (member char (list #\> #\Space))))
+       :for char := (peek-char nil stream)
+       :while (not (member char (list #\> #\Space)))
        :do
        (push char tag-name)
-       (read-char stream nil nil t)
-       (push char content)
+       (read-char stream)
+       (vector-push-extend char content)
        :finally (setf tag-name (coerce (nreverse tag-name) 'string)))
 
-    ;; Read until last </tag-name> is found
+    ;; Consume to the end of the opening tag
     (loop
-       :with tag-start := nil
-       :with close-tag-start := nil
-       :with tags-found := 0
-       :for char := (read-char stream nil nil t)
-       :while char
-       :do
-       (let ((current-tag-name (coerce (reverse current-tag-chars) 'string)))
-         #+debug(format t "~A~%" (list :char char :tag tag-name
-                                       :start tag-start :close close-tag-start
-                                       :found tags-found))
-         (cond
-           ((and tag-start
-                 (string= current-tag-name tag-name)
-                 (member char (list #\space #\newline #\tab #\>)))
-            (incf tags-found))
-           ((and close-tag-start
-                 (string= current-tag-name tag-name)
-                 (eql char #\>))
-            (if (zerop tags-found)
-                (progn
-                  (push char content)
-                  (return-from read-jsx (coerce (nreverse content) 'string)))
-                (decf tags-found)))
-           ((and (not tag-start)
-                 (eql char #\<))
-            (setf tag-start t))
-           ((and tag-start
-                 (eql char #\/))
-            (setf close-tag-start t)
-            (setf tag-start nil))
-           ((let ((new-tag-name (coerce (reverse (cons char current-tag-chars))
-                                        'string)))
-              (and (or tag-start close-tag-start)
-                   (let ((pos (search new-tag-name tag-name)))
-                     (and pos (zerop pos)))))
-            (push char current-tag-chars))
-           (t
-            (setf current-tag-chars nil)
-            (setf tag-start nil)
-            (setf close-tag-start nil))))
-       (push char content))
+       :for char := (read-char stream)
+       :while (not (eql char #\>))
+       :do (vector-push-extend char content)
+       :finally (vector-push-extend char content))
 
-    ;; Error
-    (error "Error reading JSX element: ~A" tag-name)))
+    ;; Read until last </tag-name> is found
+    (read-until-close-tag tag-name stream content)))
 
 (named-readtables:defreadtable :jsx
   (:merge :standard)
