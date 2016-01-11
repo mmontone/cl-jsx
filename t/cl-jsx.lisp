@@ -7,6 +7,9 @@
 
 (in-package :jsx.test)
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (jsx:enable-jsx-syntax))
+
 ;; NOTE: To run this test file, execute `(asdf:test-system :cl-jsx)' in your Lisp.
 
 (plan 4)
