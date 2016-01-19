@@ -21,7 +21,7 @@
                         #\=
                         space*
                         attribute-value)
-  (:destructure (name space equal space value)
+  (:destructure (name space eq space2 value)
                 (list :attribute name value)))
 
 (defrule attribute-name (+ (not (or #\/ #\> #\= space)))
